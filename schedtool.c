@@ -524,6 +524,7 @@ int set_niceness(pid_t pid, int nice)
 void probe_sched_features()
 {
 	int i;
+
 	for(i=SCHED_MIN; i <= SCHED_MAX; i++) {
 		print_prio_min_max(i);
  	}
