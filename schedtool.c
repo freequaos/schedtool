@@ -76,7 +76,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.4"
+#define VERSION "1.2.5"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -96,7 +96,7 @@
 #define SCHED_MIN SCHED_NORMAL
 #define SCHED_MAX SCHED_ISO
 
-#define CHECK_RANGE_POLICY(p) (p <= 4 && p >= 0)
+#define CHECK_RANGE_POLICY(p) (p <= SCHED_MAX && p >= SCHED_MIN)
 #define CHECK_RANGE_NICE(n) (n <= 20 && n >= -20)
 
 char *TAB[] = {
@@ -455,12 +455,10 @@ unsigned long parse_affinity(char *arg)
 
 	if(*arg == '0' && *(arg+1) == 'x') {
                 /* we're in standard hex mode */
-                /* printf("Using standard hex mode %s\n", arg); */
 		tmp_aff=strtol(optarg, NULL, 16);
 
 	} else if ((valid_len=strspn(arg, "0123456789,."))) {
 		/* new list mode: schedtool -a 0,2 -> run on CPU0 and CPU2 */
-		/* printf("Using list affinity %s, valid %d chars\n", arg, valid_len); */
 
 		/* split on ',' and '.', because '.' is near ',' :) */
 		while((tmp_arg=strsep(&arg, ",."))) {
@@ -564,6 +562,7 @@ void print_prio_min_max(int policy)
 /*
  Be more careful with at least the affinity call; someone may use an
  affinity-compiled version on a non-affinity kernel.
+ This is getting more and more fu-gly.
  */
 void print_process(pid_t pid)
 {
@@ -578,13 +577,27 @@ void print_process(pid_t pid)
 	    || ((nice=getpriority(PRIO_PROCESS, pid)) && errno)
 	  ) {
 		decode_error("could not get scheduling-information for PID %d", pid);
+
 	} else {
-		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %3d",
-		       pid,
-		       p.sched_priority,
-		       CHECK_RANGE_POLICY(policy) ? TAB[policy] : "unknown",
-                       nice
-		      );
+
+		/* do custom output for unknown policy */
+		if(! CHECK_RANGE_POLICY(policy)) {
+			printf("PID %5d: PRIO %3d, POLICY %-5d <UNKNOWN>, NICE %3d",
+			       pid,
+			       p.sched_priority,
+			       policy,
+			       nice
+			      );
+		} else {
+
+			printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %3d",
+			       pid,
+			       p.sched_priority,
+			       TAB[policy],
+			       nice
+			      );
+		}
+
 #ifdef HAVE_AFFINITY
 		/*
 		 sched_getaffinity() seems to also return (int)4 on 2.6.8+ on x86 when successful.
