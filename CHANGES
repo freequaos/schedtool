@@ -151,3 +151,9 @@ v1.1.1
 
 -added a list mode for affinity, additional to the bitmask mode
 -identified 2 FIXMEs
+
+
+Sun Aug  1 14:00:58 CEST 2004
+-fixed one fixme: check affinity input for isdigit()
+-changed the CHECK_RANGE_PRIO macro a bit for code cleanup
+-moved affinity setting to the end of the loop, because may fail with ENOSYS

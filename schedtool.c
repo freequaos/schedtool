@@ -68,7 +68,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.1.0"
+#define VERSION "1.1.2"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -227,12 +227,13 @@ int main(int ac, char **dc)
 	/* _FIFO and _RR MUST have prio set */
 	} else if((policy==SCHED_FIFO || policy==SCHED_RR)) {
 
-#define CHECK_RANGE_PRIO(p) (p <= prio_max && p >= prio_min)
+#define CHECK_RANGE_PRIO(p, p_low, p_high) (p <= (p_high) && p >= (p_low))
 		/* FIFO and RR - check min/max priority */
 		int prio_max=sched_get_priority_max(policy);
 		int prio_min=sched_get_priority_min(policy);
 
-		if(! CHECK_RANGE_PRIO(prio)) {
+		if(! CHECK_RANGE_PRIO(prio, prio_min, prio_max)) {
+			// this could be problematic on very special custom kernels
 			if(prio == 0) {
 				decode_error("missing priority; specify static priority via -p");
 			} else {
@@ -348,6 +349,17 @@ int engine(struct engine_s *e)
 			}
 
 		}
+
+		if(mode_set(e->mode, MODE_NICE)) {
+			tmpret=set_niceness(pid, e->nice);
+                        ret += tmpret;
+
+			if(tmpret) {
+				continue;
+			}
+
+		}
+
 #ifdef HAVE_AFFINITY
 		if(mode_set(e->mode, MODE_AFFINITY)) {
 			tmpret=set_affinity(pid, e->aff_mask);
@@ -359,15 +371,6 @@ int engine(struct engine_s *e)
 
 		}
 #endif
-		if(mode_set(e->mode, MODE_NICE)) {
-			tmpret=set_niceness(pid, e->nice);
-                        ret += tmpret;
-
-			if(tmpret) {
-				continue;
-			}
-
-		}
 
 		/* and print process info when set, too */
 		if(mode_set(e->mode, MODE_PRINT)) {
@@ -421,7 +424,7 @@ int set_process(pid_t pid, int policy, int prio)
 #ifdef HAVE_AFFINITY
 unsigned long parse_affinity(char *arg)
 {
-	unsigned long tmp_aff=0, tmp_cpu=0;
+	unsigned long tmp_aff=0;
 	char *tmp_arg;
         size_t valid_len;
 
@@ -434,16 +437,16 @@ unsigned long parse_affinity(char *arg)
 		/* new list mode: schedtool -a 0,2 -> run on CPU0 and CPU2 */
 		/* printf("Using list affinity %s, valid %d chars\n", arg, valid_len); */
 
-		/*
-                 FIXME
-		 truncate string to valid len!
-		 */
-
 		/* split on ',' and '.', because '.' is near ',' :) */
 		while((tmp_arg=strsep(&arg, ",."))) {
-			tmp_cpu=0x1 << atoi(tmp_arg);
-                        tmp_aff |= tmp_cpu;
-			/* printf("tmp_arg: %s -> tmp_cpu: 0x%x\n", tmp_arg, tmp_cpu); */
+                        int tmp_shift;
+
+			if(isdigit((int)*tmp_arg)) {
+				tmp_shift=atoi(tmp_arg);
+				tmp_aff |= (0x1 << tmp_shift);
+
+				printf("tmp_arg: %s -> tmp_shift: 1 << %d, tmp_aff: 0x%x\n", tmp_arg, tmp_shift, tmp_aff);
+			}
 		}
 
 	} else {
@@ -490,7 +493,7 @@ int set_niceness(pid_t pid, int nice)
 /*
  FIXME
  damn, this needs an upgrade; we simply cant spit out any information 
- as someone may have an affinity schedtool on a non-affinity machine!
+ as someone may have an affinity-compiled schedtool on a non-affinity machine!
  */
 void print_process(pid_t pid)
 {
@@ -544,7 +547,7 @@ void usage(void)
 	       "    -n NICE_LEVEL         set niceness to NICE_LEVEL\n" \
 	      );
 #ifdef HAVE_AFFINITY
-	printf("    -a AFFINITY_MASK      set CPU-affinity to bitmask (hex)\n\n");
+	printf("    -a AFFINITY_MASK      set CPU-affinity to bitmask or list\n\n");
 #endif
 	printf(
 	       "    -e COMMAND [ARGS]     start COMMAND with specified policy/priority\n" \
