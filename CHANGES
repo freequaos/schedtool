@@ -201,3 +201,10 @@ v1.2.3
 -remove superfluous break in schedtool.c::engine(), execute part
 -correct another typo in man-page
 
+
+Sat Nov 27 00:27:23 CET 2004
+v1.2.4
+
+-add a "probe" mode (-r), similar to sched-utils; lists prio_min/max
+-add helper-functions get_prio_min_max() and print_prio_min_max()
+
