@@ -141,7 +141,7 @@ A combination of an \fIaffinity\fP and a \fIpolicy\fP\-argument is \- of course 
 .fam T
 .fi 
 .SH "AFFINITY MASK"
-The \fIaffinity\fP\-argument determines on whichs CPUs a process is allowed to run.
+The \fIaffinity\fP\-argument determines on which CPUs a process is allowed to run.
 .PP 
 It consists of a simple bitmask represented in hexadecimal.
 .PP 
@@ -174,7 +174,7 @@ This is the default policy and for the average program with some interaction. Do
 \fBSCHED_FIFO\fP
 First-In, First Out Scheduler, used only for real-time contraints.
 Processes in this class are usually not preempted by others, they need to free
-themselves from the CPU via sched_yield() and as such need special
+themselves from the CPU via sched_yield() and as such you need special
 designed applications. \fBUse with extreme care.\fP
 \fBROOT-credentials required.\fP
 
