@@ -10,7 +10,7 @@ TARGET=schedtool
 DOCS=README INSTALL SCHED_DESIGN TUNING
 RELEASE=$(shell basename `pwd`)
 
-all: affinity zipman
+all: affinity
 
 clean:
 	rm -f *.o $(TARGET)
@@ -18,7 +18,7 @@ clean:
 distclean: clean unzipman
 	rm -f *~ *.s
 
-install: all install-doc
+install: all install-doc zipman
 	install -d $(DESTPREFIX)/$(DESTDIR)
 	install -c $(TARGET) $(DESTPREFIX)/$(DESTDIR)
 	install -d $(DESTPREFIX)/man/man8
