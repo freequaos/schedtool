@@ -192,3 +192,12 @@ v1.2.2
 -correct typo in man-page
 -correctly figure out affinity; I was missing an #include <linux/unistd.h>
 
+
+Sun Oct 17 00:41:43 CEST 2004
+v1.2.3
+
+-get the affinity-ifdef-stuff right. Oh my.
+-really up version to 1.2.3 (I'm getting old)
+-remove superfluous break in schedtool.c::engine(), execute part
+-correct another typo in man-page
+

@@ -53,11 +53,16 @@
 
 /* provide support for the syscalls even if the libc doesn't know about it */
 #ifdef HAVE_AFFINITY
+
+#ifdef AFFINITY_HACK
 #include "syscall_magic.h"
+#endif
+
 #ifndef __NR_sched_getaffinity
 #error You tried to build with support for affinity, but your system/headers are not ready.
 #error Please see the file INSTALL for more information.
 #endif
+
 #endif
 
 /* various operation modes: print/set/affinity/fork */
@@ -67,7 +72,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.1"
+#define VERSION "1.2.3"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -387,8 +392,9 @@ int engine(struct engine_s *e)
 			char **new_argv=e->args;
 
 			ret=execvp(*new_argv, new_argv);
+
+			/* only reached on error */
 			decode_error("schedtool: Could not exec %s", *new_argv);
-                        break;
 			return(ret);
 		}
 	}
