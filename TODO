@@ -3,6 +3,8 @@ DONE
 -add variable parsing of affinity (0x3 == "0,1" etc)
 DONE
 -add probing for available features
+DONE
 -be more dynamic (spacing in output, ...)
+PARTIAL
 -use (*f)() instead of if(mode_set(this, ...))) - core engine rewrite
 
