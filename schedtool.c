@@ -582,7 +582,7 @@ void print_process(pid_t pid)
 		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %3d",
 		       pid,
 		       p.sched_priority,
-		       TAB[policy],
+		       CHECK_RANGE_POLICY(policy) ? TAB[policy] : "unknown",
                        nice
 		      );
 #ifdef HAVE_AFFINITY
