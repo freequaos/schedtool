@@ -25,8 +25,8 @@ install: all install-doc zipman
 	install -c schedtool.8.gz $(DESTPREFIX)/man/man8
 
 install-doc:
-	install -d $(DESTPREFIX)/share/doc/$(RELEASE)
-	install -c $(DOCS) $(DESTPREFIX)/share/doc/$(RELEASE)
+	install -d $(DESTPREFIX)/share/doc/schedtool
+	install -c $(DOCS) $(DESTPREFIX)/share/doc/schedtool
 
 zipman:
 	test -f schedtool.8 && $(GZIP) schedtool.8 || exit 0
