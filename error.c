@@ -42,7 +42,7 @@ void decode_error(char *fmt, ...)
 	if(errno) {
 		/* do our own errors */
 		if (errno == EINVAL) {
-			msg="policy not implemented";
+			msg="value out of range / policy not implemented";
 			goto bail;
 		}
 
