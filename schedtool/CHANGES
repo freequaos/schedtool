@@ -1,0 +1,186 @@
+Tue Aug  6 14:42:36 CEST 2002
+v0.3
+
+-added SCHED_FIFO, SCHED_RR, static priorities
+-updated documentation
+-included some scheduler overview (sched-design.txt)
+-misc typo-fixes
+-added Makefile for fast compiling / installing
+-fixed logical errors in CHECK_RANGE_PRIO, CHECK_RANGE_POLICY
+	(must've been quite late ;-)
+
+
+Sat Aug 10 16:26:19 CEST 2002
+v0.5
+
+-man-page is ready and also installed via make install
+-README restructured
+-Wondering about the fast version-progress?
+The whole package is now roughly half of what I've been dreaming of.
+Still missing are e.g. some numbers.
+
+
+Fri Aug 30 16:52:27 CEST 2002
+v0.6 (only for me)
+
+-minor source (-h / -v switches), README and Makefile (target: zipman,
+unzipman) fixes
+
+
+Wed Sep  4 10:22:31 CEST 2002
+v0.7
+
+-huge README updates with some numbers, improvements
+-return-value updates: return values represent the number of failed
+sched_setscheduler()-calls with 0 being everything okay.
+
+
+Sun Sep 22 00:18:09 CEST 2002
+v0.8
+
+-some code work, #define SCHED_*, replace 0 with SCHED_NORMAL and such minor
+stuff
+-clarified the meaning of "higher" in README
+-asked for util-linux inclusion
+
+
+Mon Nov 11 17:26:45 CET 2002
+v0.8b
+
+-minor cleanups
+
+
+Tue Aug 26 19:53:41 CEST 2003
+v0.9
+
+-implement better error handling to return exactly (well I tried at my
+best knowledge) what went wrong during the sched_setscheduler()-call
+-set_process() no longer automatically calls print_process()
+-minor README/man-page updates regarding kernel versions 2.5 and 2.6
+
+
+Sun Aug 31 16:14:35 CEST 2003
+v0.95
+
+-add support for CPU-affinity
+-simplify error-handling in code
+-overhaul the man-page
+
+
+Tue Dec 24 21:31:59 CET 2003 (Tue Jan  6 13:37:32 CET 2004)
+v0.96
+
+-it is bad practice to have the "prerequisites" containing technical
+stuff before the "about / info"-section explaing what the hell this
+even is. README changed accordingly.
+-moved installing into file INSTALL
+-Con made a suggestion for using schedtool as a wrapper to start processes
+with adjusted scheduling-params. Here you go, Con (option -e for (e)xec)!
+-added parenthesis for safety in print_process in the big 
+if( ... || ... || ... ) --now--> if( (...) || (...) || (...) )
+-fixed an argument-BUG ("prio >= prio_min" instead of "p >= ...") in 
+#define CHECK_RANGE_PRIO which did not change behaviour, but was wrong.
+-made my debug-printing accessible via -DDEBUG_ME
+-merry christmas
+
+
+Thu Jan 15 14:41:06 CET 2004
+v0.97
+
+-changed -e(xecute) semantics from fork() to in-place exec() much like RML's
+tools do it. This means that the schedtool-process will be overwritten by 
+the specified command.
+-added padding for better readable output; may change to dynamic spacing in 
+future versions
+
+
+Wed Jan 21 15:44:59 CET 2004
+v0.98
+
+-there, people, you have it: your changed cmdline parsing, no need for quoting
+multi-argument-commands, just plain 
+#> schedtool -3 -e cpu-hog -x1 -l2
+THIS MEANS ALSO THAT YOU NO LONGER CAN MIX ARGS AND OPTIONS LIKE:
+#> schedtool 1 2 3 4 -3 5 6
+-restructured the help-output to be more "comprehendable" ... as an admin I get
+serious pain reading it now
+-and, hooray, schedtool is now silent "as that is standard unix behaviour"
+unless you specify -v, which will print for each setting PID and so on, which
+is indeed what I prefer to have.
+
+Now that you have it all like you wanted, 
+	send me money or even better, hot chicks.
+
+
+Wed Jan 28 13:51:05 CET 2004
+v0.99
+
+-build schedtool with affinity is now the default
+-changed Makefile a bit; new target no_affinity
+-included support for SCHED_ISO (patch by Con Kolivas)
+-update docs to reflect changes
+
+
+Sun Apr  4 10:38:17 CEST 2004
+v0.99.1
+
+-support nice operations; schedtool is now capable of setting ALL scheduling
+attributes!
+-minor change in engine (move execute into the loop to eliminate duplicate 
+code; the code is slowly getting a mess with all these checks here and there)
+-documentation /man-page update; man-page now lists SCHED_*
+-Makefile: new target install-doc, installs some docs into $PREFIX/share/doc/schedtool
+
+
+Tue Apr 20 11:45:19 CEST 2004
+v1.0
+
+-released 1.0; more documentation updates and clarifications
+
+
+Wed Jun 30 20:27:29 CEST 2004
+v1.1.0
+
+-added "NO WARRANTY" to help output
+-add raw mode for the kernel hackers; allows direct input of the numerical 
+policy value and changed docs accordingly.
+
+
+Mon Jul  5 14:12:35 CEST 2004
+v1.1.1
+
+-added a list mode for affinity, additional to the bitmask mode
+-identified 2 FIXMEs
+
+
+Sun Aug  1 14:00:58 CEST 2004
+
+-fixed one fixme: check affinity input for isdigit()
+-changed the CHECK_RANGE_PRIO macro a bit for code cleanup
+-moved affinity setting to the end of the loop, because may fail with ENOSYS
+
+
+Sun Sep 19 19:50:09 CEST 2004
+v1.1.2
+
+-added missing padding for NICE in output
+-changed custom "policy not implemented" error to "value out of range / policy
+not implemented" to indicate wrong values when setting affinity or such
+
+
+Tue Sep 28 20:59:42 CEST 2004
+v1.2
+
+-finally try to not break affinity-compiled binaries on non-affinity kernels
+(2nd FIXME fixed)
+-use getpid() instead of PID 0 (== current process) when in execute mode
+
+
+Sun Oct  3 18:14:46 CEST 2004
+v1.2.1
+
+-REALLY DO NOT break affinity stuff; sched_getaffinity() suddenly returns 4 on
+success instead of 0 as declared in the man-page on at least kernels 2.6.8+
+-pad nice-levels correctly; they can be negative, as such we need %3d in 
+printf()
+
