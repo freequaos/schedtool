@@ -1,0 +1,32 @@
+FIRST AND FOREMOST
+------------------
+- be sure to set all your IDE disks to use DMA transfers:
+hdparm -d1 /dev/hda
+ or even
+hdparm -A1 -X66 -c1 -d1 /dev/hda
+
+Please see the man-page for hdparm for explanation of the other options.
+Can also be applied to CDROMs.
+
+- run your own optimized kernel
+(kernel building IS fun)
+
+
+MPLAYER
+-------
+- use -vo xvidix or -vo xv to offload work to your gfx-card
+- use a natively (especially for your CPU) compiled mplayer
+(again, this is fun and you will learn)
+- use hdparm -u1 -A1 -a 160 <device-your-movies-comes-from>
+- nicing to -5 or -10 already helps, but requires root-privileges
+
+
+XMMS
+----
+- really should never skip, even at considerable background-compiling load
+go and compile it with CPU-optimizations for your CPU
+- set the output-buffer to a higher value
+( Preferences -> Output Plugin -> configure -> Buffering -> Buffer size(ms)
+Enter something like 2500 oder 3000 )
+- use a decent soundcards that actually does things in hardware
+Switching from ISA- to PCI-cards helps a lot

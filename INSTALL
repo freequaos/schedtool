@@ -1,0 +1,81 @@
+PREREQUISITES:
+--------------
+This package is released under the terms of the GPL2; you can read it in the
+file LICENSE. Use at your own risk.
+
+SCHED_NORMAL, SCHED_FIFO and SCHED_RR are the supported out of the box
+by every linux-kernel.
+If you want to use special scheduling policies, get the according patches
+listed below.
+
+
+o SCHED_BATCH:
+	Kernel 2.4.18+ with Ingo Molnar's O(1)-sched-patch
+	[ http://www.kernel.org/pub/linux/kernel/people/mingo ]
+
+	2.5.X kernels and the stock 2.6 don't seem to know about SCHED_BATCH.
+	Con Kolivas maintains patches for 2.6.
+	[ http://ck.kolivas.org/patches/2.6 ]
+
+
+o SCHED_ISO:
+	2.6.X and special patches by Con Kolivas
+	[ http://ck.kolivas.org/patches/2.6 ]
+
+
+o CPU-AFFINITY:
+	kernel 2.5.8 or later
+
+	RedHat9 does contain a patched kernel that supports CPU-affinity
+
+	for 2.4.X the -aa series also contain support for CPU-affinity
+	[ http://www.kernel.org/pub/linux/kernel/people/andrea ]
+
+
+INSTALLING:
+-----------
+If you want to build WITH CPU-affinity support, do
+	#> make
+or
+	#> make affinity
+
+If that gives you errors about affinity or sched_setaffinity, you don't 
+have your system ready for affinity - likely you have a too old glibc 
+without that support.
+
+If you are sure your kernel does support affinity, you can build with
+	#> make affinity_hack
+
+
+To build without affinity:
+	#> make no_affinity
+
+
+To install, type:
+	#> make install
+
+The default prefix is /usr/local, so the binary will be put into
+/usr/local/bin, the man-page into /usr/local/man/man8; additional docs are put
+into $PREFIX/share/doc/schedtool.
+
+You may change the destination in the Makefile.
+
+You can define DEBUG (either by adding -DDEBUG to CFLAGS in the Makefile 
+or specifying them to make) to get additional output.
+
+
+- -- - -- - -- -
+
+For the curious, look into:
+
+/usr/src/linux/include/linux/sched.h
+
+and locate the following:
+
+/*
+ * Scheduling policies
+ */
+#define SCHED_OTHER             0
+#define SCHED_FIFO              1
+#define SCHED_RR                2
+
