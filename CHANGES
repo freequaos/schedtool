@@ -186,7 +186,9 @@ printf()
 
 
 Tue Oct 12 13:04:53 CEST 2004
+v1.2.2
 
 -adjust copyright
 -correct typo in man-page
+-correctly figure out affinity; I was missing an #include <linux/unistd.h>
 

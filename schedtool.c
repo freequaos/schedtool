@@ -37,6 +37,8 @@
 #include <sys/resource.h>
 #include <sched.h>
 #include <unistd.h>
+/* this gets us the list of syscalls */
+#include <linux/unistd.h>
 
 #include "error.h"
 #include "util.h"
@@ -50,11 +52,8 @@
  */
 
 /* provide support for the syscalls even if the libc doesn't know about it */
-#ifdef HAVE_AFFINITY_HACK
-#include "syscall_magic.h"
-#endif
-
 #ifdef HAVE_AFFINITY
+#include "syscall_magic.h"
 #ifndef __NR_sched_getaffinity
 #error You tried to build with support for affinity, but your system/headers are not ready.
 #error Please see the file INSTALL for more information.
