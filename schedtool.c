@@ -311,7 +311,7 @@ int engine(struct engine_s *e)
 	 handle normal query/set operation:
 	 set/query all given PIDs
 	 */
-	for(i=0;i < e->n;i++) {
+	for(i=0; i < e->n; i++) {
 
 		int pid, tmpret=0;
 
@@ -444,8 +444,9 @@ unsigned long parse_affinity(char *arg)
 			if(isdigit((int)*tmp_arg)) {
 				tmp_shift=atoi(tmp_arg);
 				tmp_aff |= (0x1 << tmp_shift);
-
+#ifdef DEBUG
 				printf("tmp_arg: %s -> tmp_shift: 1 << %d, tmp_aff: 0x%x\n", tmp_arg, tmp_shift, tmp_aff);
+#endif
 			}
 		}
 
@@ -454,7 +455,9 @@ unsigned long parse_affinity(char *arg)
 		exit(1);
 	}
 
-	/* printf("Affinity result: 0x%x\n", tmp_aff); */
+#ifdef DEBUG
+	printf("Affinity result: 0x%x\n", tmp_aff);
+#endif
 	return tmp_aff;
 }
 
@@ -513,7 +516,7 @@ void print_process(pid_t pid)
 
 		decode_error("could not get scheduling-information for PID %d", pid);
 	} else {
-		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %d",
+		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %2d",
 		       pid,
 		       p.sched_priority,
 		       TAB[policy],
