@@ -167,3 +167,10 @@ v1.1.2
 -changed custom "policy not implemented" error to "value out of range / policy
 not implemented" to indicate wrong values when setting affinity or such
 
+
+Sun Sep 26 12:23:58 CEST 2004
+
+-finally try to not break affinity-compiled binaries on non-affinity kernels
+(2nd FIXME fixed)
+-use getpid() instead of PID 0 (== current process) when in execute mode
+

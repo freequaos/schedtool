@@ -498,9 +498,8 @@ int set_niceness(pid_t pid, int nice)
 
 
 /*
- FIXME
- damn, this needs an upgrade; we simply cant spit out any information 
- as someone may have an affinity-compiled schedtool on a non-affinity machine!
+ Be more careful with at least the affinity call; someone may use an
+ affinity-compiled version on a non-affinity kernel.
  */
 void print_process(pid_t pid)
 {
@@ -511,13 +510,9 @@ void print_process(pid_t pid)
 	/* strict error checking not needed - it works or not. */
 	if( ((policy=sched_getscheduler(pid)) < 0)
 	    || (sched_getparam(pid, &p) < 0)
-#ifdef HAVE_AFFINITY
-	    || (sched_getaffinity(pid, sizeof(aff_mask), &aff_mask) < 0)
-#endif
 	    /* getpriority may successfully return negative values, so errno needs to be checked */
 	    || ((nice=getpriority(PRIO_PROCESS, pid)) && errno)
 	  ) {
-
 		decode_error("could not get scheduling-information for PID %d", pid);
 	} else {
 		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %2d",
@@ -527,9 +522,17 @@ void print_process(pid_t pid)
                        nice
 		      );
 #ifdef HAVE_AFFINITY
-		printf(", AFFINITY 0x%lx", aff_mask);
+		if(sched_getaffinity(pid, sizeof(aff_mask), &aff_mask) != 0) {
+			/*
+			 error or -ENOSYS
+                         simply ignore and reset errno!
+			 */
+                        errno=0;
+		} else {
+			printf(", AFFINITY 0x%lx", aff_mask);
+		}
 #endif
-                printf("\n");
+	printf("\n");
 	}
 }
 
