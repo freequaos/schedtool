@@ -68,7 +68,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.1.2"
+#define VERSION "1.2"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -515,14 +515,18 @@ void print_process(pid_t pid)
 	  ) {
 		decode_error("could not get scheduling-information for PID %d", pid);
 	} else {
-		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %2d",
+		printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %3d",
 		       pid,
 		       p.sched_priority,
 		       TAB[policy],
                        nice
 		      );
 #ifdef HAVE_AFFINITY
-		if(sched_getaffinity(pid, sizeof(aff_mask), &aff_mask) != 0) {
+		/*
+		 sched_getaffinity() seems to also return (int)4 on 2.6.8+ on x86 when successful.
+		 this goes against the documentation
+                 */
+		if(sched_getaffinity(pid, sizeof(aff_mask), &aff_mask) == -1) {
 			/*
 			 error or -ENOSYS
                          simply ignore and reset errno!

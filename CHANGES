@@ -168,9 +168,19 @@ v1.1.2
 not implemented" to indicate wrong values when setting affinity or such
 
 
-Sun Sep 26 12:23:58 CEST 2004
+Tue Sep 28 20:59:42 CEST 2004
+v1.2
 
 -finally try to not break affinity-compiled binaries on non-affinity kernels
 (2nd FIXME fixed)
 -use getpid() instead of PID 0 (== current process) when in execute mode
+
+
+Sun Oct  3 18:14:46 CEST 2004
+v1.2.1
+
+-REALLY DO NOT break affinity stuff; sched_getaffinity() suddenly returns 4 on
+success instead of 0 as declared in the man-page on at least kernels 2.6.8+
+-pad nice-levels correctly; they can be negative, as such we need %3d in 
+printf()
 
