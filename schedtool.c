@@ -9,6 +9,9 @@
  01/2004:
  included SCHED_ISO patch by Con Kolivas
 
+ 11/2004:
+ add probing for some features (priority)
+
  Born in the need of querying and setting SCHED_* policies.
  All output, even errors, go to STDOUT to ease piping.
 
@@ -17,6 +20,7 @@
  - schedtool can now be used to exec a new process with specific parameters.
 
  - nice functionality is incorporated.
+
 
  Content:
 
@@ -72,7 +76,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.3"
+#define VERSION "1.2.4"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -88,6 +92,9 @@
 #define SCHED_RR	2
 #define SCHED_BATCH	3
 #define SCHED_ISO	4
+/* for loops */
+#define SCHED_MIN SCHED_NORMAL
+#define SCHED_MAX SCHED_ISO
 
 #define CHECK_RANGE_POLICY(p) (p <= 4 && p >= 0)
 #define CHECK_RANGE_NICE(n) (n <= 20 && n >= -20)
@@ -116,13 +123,16 @@ struct engine_s {
 };
 
 
+int engine(struct engine_s *e);
+int set_process(pid_t pid, int policy, int prio);
+unsigned long parse_affinity(char *arg);
+int set_affinity(pid_t pid, unsigned long mask);
+int set_niceness(pid_t pid, int nice);
+void probe_sched_features();
+void get_prio_min_max(int policy, int *min, int *max);
+void print_prio_min_max(int policy);
+void print_process(pid_t pid);
 void usage(void);
-int engine(struct engine_s *);
-int set_process(pid_t, int, int);
-int set_affinity(pid_t, unsigned long);
-int set_niceness(pid_t, int);
-unsigned long parse_affinity(char *);
-void print_process(pid_t);
 
 
 extern char *optarg;
@@ -150,7 +160,7 @@ int main(int ac, char **dc)
 		return(0);
 	}
 
-	while((c=getopt(ac, dc, "+NFRBI01234M:a:p:n:evh")) != -1) {
+	while((c=getopt(ac, dc, "+NFRBI01234M:a:p:n:ervh")) != -1) {
 
 		switch(c) {
 		case '0':
@@ -202,6 +212,9 @@ int main(int ac, char **dc)
 		case 'p':
 			prio=atoi(optarg);
 			break;
+		case 'r':
+                        probe_sched_features();
+			break;
 		case 'v':
                         /* the user wants feedback for each process */
 			mode |= MODE_PRINT;
@@ -233,8 +246,11 @@ int main(int ac, char **dc)
 
 #define CHECK_RANGE_PRIO(p, p_low, p_high) (p <= (p_high) && p >= (p_low))
 		/* FIFO and RR - check min/max priority */
-		int prio_max=sched_get_priority_max(policy);
-		int prio_min=sched_get_priority_min(policy);
+		int prio_min, prio_max;
+
+		get_prio_min_max(policy, &prio_min, &prio_max);
+		//int prio_max=sched_get_priority_max(policy);
+		//int prio_min=sched_get_priority_min(policy);
 
 		if(! CHECK_RANGE_PRIO(prio, prio_min, prio_max)) {
 			// this could be problematic on very special custom kernels
@@ -503,6 +519,48 @@ int set_niceness(pid_t pid, int nice)
 
 
 /*
+ probe some features; just basic right now
+ */
+void probe_sched_features()
+{
+	int i;
+	for(i=SCHED_MIN; i <= SCHED_MAX; i++) {
+		print_prio_min_max(i);
+ 	}
+}
+
+
+/*
+ get the min/max static priorites of a given policy. Max only work
+ for SCHED_FIFO / SCHED_RR
+ */
+void get_prio_min_max(int policy, int *min, int *max)
+{
+	*min=sched_get_priority_min(policy);
+        *max=sched_get_priority_max(policy);
+}
+
+
+/* print the min and max priority of a given policy, like chrt does */
+void print_prio_min_max(int policy)
+{
+	int min, max;
+
+	get_prio_min_max(policy, &min, &max);
+
+	switch(min|max) {
+
+	case -1:
+		printf("%-15s: policy not implemented\n", TAB[policy]);
+                break;
+	default:
+		printf("%-15s: prio_min %d, prio_max %d\n", TAB[policy], min, max);
+                break;
+	}
+}
+
+
+/*
  Be more careful with at least the affinity call; someone may use an
  affinity-compiled version on a non-affinity kernel.
  */
@@ -570,7 +628,8 @@ void usage(void)
 #endif
 	printf(
 	       "    -e COMMAND [ARGS]     start COMMAND with specified policy/priority\n" \
-               "    -v                    be verbose\n" \
+	       "    -r                    display priority min/max for each policy\n" \
+	       "    -v                    be verbose\n" \
 	       "\n" \
 	      );
 /*	printf("Parent ");
