@@ -169,6 +169,16 @@ STATIC_PRIO can't be assigned to SCHED_NORMAL or SCHED_BATCH. The
 code won't prevent this (a warning is printed - think UNIX), you maybe get an 
 error later at the setting-call.
 
+v1.2.4+ support a probe mode like sched-utils; it will display each policy's 
+min and max priority, when given the -r parameter.
+
+#> schedtool -r
+N: SCHED_NORMAL: prio_min 0, prio_max 0
+F: SCHED_FIFO  : prio_min 1, prio_max 99
+R: SCHED_RR    : prio_min 1, prio_max 99
+B: SCHED_BATCH : policy not implemented
+I: SCHED_ISO   : policy not implemented
+
 
 
 POLICY OVERVIEW + WHERE TO USE:
