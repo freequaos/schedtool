@@ -154,6 +154,16 @@ v1.1.1
 
 
 Sun Aug  1 14:00:58 CEST 2004
+
 -fixed one fixme: check affinity input for isdigit()
 -changed the CHECK_RANGE_PRIO macro a bit for code cleanup
 -moved affinity setting to the end of the loop, because may fail with ENOSYS
+
+
+Sun Sep 19 19:50:09 CEST 2004
+v1.1.2
+
+-added missing padding for NICE in output
+-changed custom "policy not implemented" error to "value out of range / policy
+not implemented" to indicate wrong values when setting affinity or such
+
