@@ -321,7 +321,11 @@ int engine(struct engine_s *e)
 			 pid 0 == me, myself & I: set ourselves to
 			 the parameters prior to exec()
 			 */
-			pid=0;
+			/*
+			 don't used pid=0 anymore; maybe somebody
+			 likes to know the real pid
+                         */
+			pid=getpid();
 			goto exec_mode_special;
 		}
 
