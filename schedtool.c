@@ -235,14 +235,14 @@ int main(int ac, char **dc)
 	 parameter checking
          ARGH!
 	 */
-	/* for _BATCH and _NORMAL, prio is ignored and must be 0 */
-	if((policy==SCHED_NORMAL || policy==SCHED_BATCH || policy==SCHED_ISO) && prio) {
+	/* for _BATCH and _NORMAL, prio is ignored and must be 0*/
+	if((policy==SCHED_NORMAL || policy==SCHED_BATCH) && prio) {
 		decode_error("%s call may fail as static PRIO must be 0 or omitted",
 			     TAB[policy]
 			    );
 
 	/* _FIFO and _RR MUST have prio set */
-	} else if((policy==SCHED_FIFO || policy==SCHED_RR)) {
+	} else if((policy==SCHED_FIFO || policy==SCHED_RR || policy==SCHED_ISO)) {
 
 #define CHECK_RANGE_PRIO(p, p_low, p_high) (p <= (p_high) && p >= (p_low))
 		/* FIFO and RR - check min/max priority */
@@ -631,7 +631,7 @@ void usage(void)
 	       "    -F -p PRIO            for SCHED_FIFO       only as root\n" \
 	       "    -R -p PRIO            for SCHED_RR         only as root\n" \
                "    -B                    for SCHED_BATCH\n" \
-               "    -I                    for SCHED_ISO\n\n" \
+               "    -I -p PRIO            for SCHED_ISO\n\n" \
                "    -M POLICY             for manual mode; raw number for POLICY\n" \
 	       "    -p STATIC_PRIORITY    usually 1-99; only for FIFO or RR\n" \
 	       "                          higher numbers means higher priority\n" \
