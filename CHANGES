@@ -208,3 +208,12 @@ v1.2.4
 -add a "probe" mode (-r), similar to sched-utils; lists prio_min/max
 -add helper-functions get_prio_min_max() and print_prio_min_max()
 
+
+Sat Feb  5 19:59:44 CET 2005
+v1.2.5
+
+-fix NULL pointer printing when policy is out-of-range of TAB[] ; instead,
+print numeric value + <UNKNOWN>
+-behave more nicely with SCHED_ISO and newer -ck kernels (inspired by cr7)
+
+
