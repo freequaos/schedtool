@@ -337,14 +337,6 @@ int engine(struct engine_s *e)
 
                 /* if in MODE_EXEC skip check for PIDs */
 		if(mode_set(e->mode, MODE_EXEC)) {
-			/*
-			 pid 0 == me, myself & I: set ourselves to
-			 the parameters prior to exec()
-			 */
-			/*
-			 don't used pid=0 anymore; maybe somebody
-			 likes to know the real pid
-                         */
 			pid=getpid();
 			goto exec_mode_special;
 		}
