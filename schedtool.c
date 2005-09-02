@@ -1,6 +1,6 @@
 /*
  schedtool
- Copyright (C) 2002-2004 by Freek
+ Copyright (C) 2002-2005 by Freek
  Please contact me via freshmeat.net
  Release under GPL, version 2
  Use at your own risk.
