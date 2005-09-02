@@ -622,8 +622,9 @@ void usage(void)
 	       "    -N                    for SCHED_NORMAL\n" \
 	       "    -F -p PRIO            for SCHED_FIFO       only as root\n" \
 	       "    -R -p PRIO            for SCHED_RR         only as root\n" \
-               "    -B                    for SCHED_BATCH\n" \
-               "    -I -p PRIO            for SCHED_ISO\n\n" \
+	       "    -B                    for SCHED_BATCH      [deprecated]\n" \
+	       "    -I -p PRIO            for SCHED_ISO        [deprecated]\n" \
+               "\n" \
                "    -M POLICY             for manual mode; raw number for POLICY\n" \
 	       "    -p STATIC_PRIORITY    usually 1-99; only for FIFO or RR\n" \
 	       "                          higher numbers means higher priority\n" \
