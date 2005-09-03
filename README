@@ -221,6 +221,9 @@ Good for gaming, video at the limits of hardware, video capture etc.
 It is best set using the schedtool by a normal user trying to start something
 as SCHED_RR." [ http://kerneltrap.org/node/view/2159 ]
 
+SCHED_ISO is now deprecated; SCHED_RR is now possible for normal users, albeit
+to a limited amount only. See newer kernels. Con has removed support.
+
 
 For more information you can read the file SCHED_DESIGN as a good overview, but 
 be warned, that *some* things may be outdated by the new O(1)-patches.
