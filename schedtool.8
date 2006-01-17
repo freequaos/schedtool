@@ -7,7 +7,7 @@
 .fam C
 .TP 
 \fBschedtool\fP
-[\fB\-0\fP|\fB\-N\fP] [\fB\-1\fP|\fB\-F\fP] [\fB\-2\fP|\fB\-R\fP] [\fB\-3\fP|\fB\-B\fP] [\fB\-4\fP|\fB\-I\fP]
+[\fB\-0\fP|\fB\-N\fP] [\fB\-1\fP|\fB\-F\fP] [\fB\-2\fP|\fB\-R\fP] [\fB\-3\fP|\fB\-B\fP] [\fB\-4\fP|\fB\-I\fP] [\fB\-5\fP|\fB\-D\fP]
 [\fB\-M\fP \fIpolicy\fP]
 [\fB\-a\fP \fIaffinity\fP] 
 [\fB\-p\fP \fIprio\fP]
@@ -51,6 +51,10 @@ to SCHED_BATCH
 to SCHED_ISO	
 .TP 
 .B 
+\fB\-D\fP or \fB\-5\fP
+to SCHED_IDLEPRIO  
+.TP
+.B
 \fB\-M\fP \fIpolicy\fP
 for manual/raw mode; policy is the number of the scheduling policy (see above for 0-4). 
 This option is mostly for kernel guys that want to test their new implementations.
@@ -192,12 +196,13 @@ peak rate of the system.
 \fBROOT-credentials required.\fP
 
 .PP
-\fBSCHED_BATCH\fP [ patch needed ]
+\fBSCHED_BATCH\fP [ now in 2.6 mainline ]
 SCHED_BATCH was designed for non-interactive, CPU-bound applications.
 It uses longer timeslices (to better exploit the cache), but can be
 interrupted anytime by other processes in other classes to guaratee
 interaction of the system. Processes in this class are selected last
 but may result in a considerable speed-up (up to 300%).
+
 .PP
 \fBSCHED_ISO\fP [ patch needed ]
 SCHED_ISO was designed to give users a SCHED_RR-similar class.
@@ -205,12 +210,17 @@ To quote Con Kolivas: "This is a non-expiring scheduler policy designed to
 guarantee a timeslice within a reasonable latency while preventing starvation.
 Good for gaming, video at the limits of hardware, video capture etc."
 
+.PP
+\fBSCHED_IDLEPRIO\fP [ patch needed ]
+SCHED_IDLEPRIO is similar to SCHED_BATCH, but was explicitely designed
+to consume only the time the CPU is idle.
+
 .SH "HINTS"
 PID 0 means "current process", in our case, schedtool. May occur when using the \-e switch.
 .PP 
 Be careful with SCHED_FIFO! You may lock out other processes from the CPU, including your shell.
 .PP 
-For SCHED_BATCH you \fIcertainly\fP need the \fBO(1)\-sched\-patch\fP.
+For SCHED_BATCH you \fIcertainly\fP need the a recent 2.6 kernel.
 .PP 
 A short overview is given in SCHED_DESIGN and the \fBREADME\fP contains thourough discussion. The \fBINSTALL\fP file also lists all prerequisites and where you can get patches.
 .PP 

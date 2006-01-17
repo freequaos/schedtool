@@ -197,7 +197,7 @@ read() or actively free themselves from the CPU via the system-call
 sched_yield(2).
 
 
-SCHED_BATCH [patch needed, see INSTALL]
+SCHED_BATCH
 is encuraged for long-running and non-interactive
 processes; the timeslice is considerably longer (1.5s I think) -
 these processes, though, are interrupted almost anytime by other ones to 
@@ -208,6 +208,7 @@ admin of a compute-server, you could set their shells to SCHED_BATCH
 via the login-script.
 The best way is to have a short talk and give some explanation about
 the benefits.
+SCHED_BATCH has been included in recent 2.6 kernels.
 
 
 SCHED_ISO [patch needed, see INSTALL]
@@ -221,8 +222,11 @@ Good for gaming, video at the limits of hardware, video capture etc.
 It is best set using the schedtool by a normal user trying to start something
 as SCHED_RR." [ http://kerneltrap.org/node/view/2159 ]
 
-SCHED_ISO is now deprecated; SCHED_RR is now possible for normal users, albeit
-to a limited amount only. See newer kernels. Con has removed support.
+SCHED_ISO is now somewhat deprecated; SCHED_RR is now possible for normal users,
+albeit to a limited amount only. See newer kernels.
+
+
+SCHED_IDLEPRIO [patch needed, see INSTALL]
 
 
 For more information you can read the file SCHED_DESIGN as a good overview, but 

@@ -1,10 +1,13 @@
 /*
  schedtool
- Copyright (C) 2002-2005 by Freek
+ Copyright (C) 2002-2006 by Freek
  Please contact me via freshmeat.net
  Release under GPL, version 2
  Use at your own risk.
  Inspired by setbatch (C) 2002 Ingo Molnar
+
+ 01/2006:
+ included support for SCHED_IDLEPRIO for ck kernels
 
  01/2004:
  included SCHED_ISO patch by Con Kolivas
@@ -76,7 +79,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.5"
+#define VERSION "1.2.6"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -92,9 +95,11 @@
 #define SCHED_RR	2
 #define SCHED_BATCH	3
 #define SCHED_ISO	4
+#define SCHED_IDLE	5
+
 /* for loops */
 #define SCHED_MIN SCHED_NORMAL
-#define SCHED_MAX SCHED_ISO
+#define SCHED_MAX SCHED_IDLE
 
 #define CHECK_RANGE_POLICY(p) (p <= SCHED_MAX && p >= SCHED_MIN)
 #define CHECK_RANGE_NICE(n) (n <= 20 && n >= -20)
@@ -105,6 +110,7 @@ char *TAB[] = {
 	"R: SCHED_RR",
 	"B: SCHED_BATCH",
 	"I: SCHED_ISO",
+	"D: SCHED_IDLE",
 	0
 };
 
@@ -160,7 +166,7 @@ int main(int ac, char **dc)
 		return(0);
 	}
 
-	while((c=getopt(ac, dc, "+NFRBI01234M:a:p:n:ervh")) != -1) {
+	while((c=getopt(ac, dc, "+NFRBID012345M:a:p:n:ervh")) != -1) {
 
 		switch(c) {
 		case '0':
@@ -186,6 +192,11 @@ int main(int ac, char **dc)
 		case '4':
 		case 'I':
 			policy=SCHED_ISO;
+                        mode |= MODE_SETPOLICY;
+			break;
+		case '5':
+		case 'D':
+			policy=SCHED_IDLE;
                         mode |= MODE_SETPOLICY;
 			break;
 		case 'M':
@@ -622,8 +633,9 @@ void usage(void)
 	       "    -N                    for SCHED_NORMAL\n" \
 	       "    -F -p PRIO            for SCHED_FIFO       only as root\n" \
 	       "    -R -p PRIO            for SCHED_RR         only as root\n" \
-	       "    -B                    for SCHED_BATCH      [deprecated]\n" \
-	       "    -I -p PRIO            for SCHED_ISO        [deprecated]\n" \
+	       "    -B                    for SCHED_BATCH\n" \
+	       "    -I -p PRIO            for SCHED_ISO\n" \
+	       "    -D                    for SCHED_IDLEPRIO\n" \
                "\n" \
                "    -M POLICY             for manual mode; raw number for POLICY\n" \
 	       "    -p STATIC_PRIORITY    usually 1-99; only for FIFO or RR\n" \

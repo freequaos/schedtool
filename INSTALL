@@ -13,12 +13,12 @@ o SCHED_BATCH:
 	Kernel 2.4.18+ with Ingo Molnar's O(1)-sched-patch
 	[ http://www.kernel.org/pub/linux/kernel/people/mingo ]
 
-	2.5.X kernels and the stock 2.6 don't seem to know about SCHED_BATCH.
-	Con Kolivas maintains patches for 2.6.
+	Recent 2.6 kernel now have support for SCHED_BATCH.
+	Con Kolivas also maintains patches for 2.6.
 	[ http://ck.kolivas.org/patches/2.6 ]
 
 
-o SCHED_ISO:
+o SCHED_ISO and SCHED_IDLEPRIO:
 	2.6.X and special patches by Con Kolivas
 	[ http://ck.kolivas.org/patches/2.6 ]
 
