@@ -217,3 +217,10 @@ print numeric value + <UNKNOWN>
 -behave more nicely with SCHED_ISO and newer -ck kernels (inspired by cr7)
 
 
+Tue Jan 17 18:50:04 CET 2006
+v1.2.6
+
+-add support for SCHED_IDLEPRIO in 2.6.16-ck kernels
+-update documentation accordingly; remove old stuff about SCHED_BATCH which is
+in mainline 2.6 now
+
