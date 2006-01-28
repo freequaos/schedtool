@@ -202,13 +202,12 @@ is encuraged for long-running and non-interactive
 processes; the timeslice is considerably longer (1.5s I think) -
 these processes, though, are interrupted almost anytime by other ones to 
 guarantee interactivenes.
+Processes won't get any interactive boosts.
 
 Users are encuraged to set their computing jobs to SCHED_BATCH. Or, as
 admin of a compute-server, you could set their shells to SCHED_BATCH
 via the login-script.
-The best way is to have a short talk and give some explanation about
-the benefits.
-SCHED_BATCH has been included in recent 2.6 kernels.
+SCHED_BATCH has been included in 2.6.15+ kernels.
 
 
 SCHED_ISO [patch needed, see INSTALL]
@@ -227,7 +226,10 @@ albeit to a limited amount only. See newer kernels.
 
 
 SCHED_IDLEPRIO [patch needed, see INSTALL]
-
+SCHED_IDLEPRIO was formerly called SCHED_BATCH in the -ck patchset; the
+-ck SCHED_BATCH has nothing to do with the mainline SCHED_BATCH!
+It is a policy where the process does not get any interactive boost
+(thru sleeping etc) and also only the idle CPU time.
 
 For more information you can read the file SCHED_DESIGN as a good overview, but 
 be warned, that *some* things may be outdated by the new O(1)-patches.
