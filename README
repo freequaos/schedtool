@@ -207,7 +207,7 @@ Processes won't get any interactive boosts.
 Users are encuraged to set their computing jobs to SCHED_BATCH. Or, as
 admin of a compute-server, you could set their shells to SCHED_BATCH
 via the login-script.
-SCHED_BATCH has been included in 2.6.15+ kernels.
+SCHED_BATCH has been included in 2.6.16+ kernels.
 
 
 SCHED_ISO [patch needed, see INSTALL]

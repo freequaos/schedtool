@@ -196,7 +196,7 @@ peak rate of the system.
 \fBROOT-credentials required.\fP
 
 .PP
-\fBSCHED_BATCH\fP [ since 2.6.15 in mainline ]
+\fBSCHED_BATCH\fP [ since 2.6.16 in mainline ]
 SCHED_BATCH was designed for non-interactive, CPU-bound applications.
 It uses longer timeslices (to better exploit the cache), but can be
 interrupted anytime by other processes in other classes to guaratee
@@ -216,7 +216,7 @@ Good for gaming, video at the limits of hardware, video capture etc."
 SCHED_IDLEPRIO is similar to SCHED_BATCH, but was explicitely designed
 to consume only the time the CPU is idle. No interactive boosting is done.
 If you used SCHED_BATCH in the -ck kernels this is what you want since
-2.6.15
+2.6.16
 
 .SH "HINTS"
 PID 0 means "current process", in our case, schedtool. May occur when using the \-e switch.
