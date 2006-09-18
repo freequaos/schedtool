@@ -1,5 +1,5 @@
 schedtool
-Copyright (C) 2002-2004 Freek
+Copyright (C) 2002-2006 Freek
 Release under GPL, version 2 (see LICENSE)
 Use at your own risk.
 Inspired by setbatch (C) 2002 Ingo Molnar
@@ -22,7 +22,7 @@ ABOUT:
 ------
 
 schedtool was born, because there was no tool to change or query
-CPU-scheduling policies under Linux.
+all CPU-scheduling policies under Linux, in one handy command.
 Support for CPU-affinity has also been added and most recently 
 (re-)nicing of processes.
 Thus, schedtool is the definitive interface to Linux's scheduler.
