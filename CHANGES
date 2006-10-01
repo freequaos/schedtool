@@ -224,3 +224,9 @@ v1.2.6
 -update documentation accordingly; remove old stuff about SCHED_BATCH which is
 in mainline 2.6 now
 
+
+Mon Sep 30 22:29:48 CEST 2006
+v1.2.7
+
+-update man-page: get section(8) right again, mention affinity list mode
+

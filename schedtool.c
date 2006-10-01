@@ -79,7 +79,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.6"
+#define VERSION "1.2.7"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
