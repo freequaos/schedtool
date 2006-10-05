@@ -44,6 +44,8 @@
 #include <sys/resource.h>
 #include <sched.h>
 #include <unistd.h>
+#include <stdint.h>
+
 /* this gets us the list of syscalls */
 #include <linux/unistd.h>
 
@@ -155,8 +157,12 @@ int main(int ac, char **dc)
 	 */
 	int policy=-1, nice=10, prio=0, mode=MODE_NOTHING;
 
-	/* default aff_mask to 0xFFFF FFFF FFFF FFFF== all CPUs */
-	unsigned long aff_mask=(0-1);
+	/*
+	 default aff_mask to 0xFF..FF== all CPUs
+         unsigned long has not a defined number of bits on all arches
+	 so: use the biggest type and cast it down so we should stay portable
+	 */
+	unsigned long aff_mask=(unsigned long)UINT64_MAX;
 
         /* for getopt() */
 	int c;
