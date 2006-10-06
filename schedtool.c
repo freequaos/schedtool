@@ -466,7 +466,7 @@ unsigned long parse_affinity(char *arg)
                 /* we're in standard hex mode */
 		tmp_aff=strtol(optarg, NULL, 16);
 
-	} else if ((valid_len=strspn(arg, "0123456789,."))) {
+	} else if( (valid_len=strspn(arg, "0123456789,.")) ) {
 		/* new list mode: schedtool -a 0,2 -> run on CPU0 and CPU2 */
 
 		/* split on ',' and '.', because '.' is near ',' :) */
