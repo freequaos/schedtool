@@ -154,10 +154,7 @@ A combination of an \fIaffinity\fP and a \fIpolicy\fP\-argument is \- of course 
 .fi 
 
 .SH "AFFINITY MASK"
-The \fIaffinity\fP\-argument determines on which CPUs a process is allowed to run.
-.PP 
-It consists of a simple bitmask represented in hexadecimal.
-.PP 
+The \fIaffinity\fP\-argument determines on which CPUs a process is allowed to run. It consists of a simple bitmask represented in hexadecimal.
 CPU0 is denoted by the least\-significant bit, CPU1 by the second least\-significant and so on, thus giving:
 .PP 
     \fB0x1\fP \-> only run on CPU0
@@ -182,11 +179,11 @@ The default is to run a process on all CPUs, giving a mask of
 
 .SH "AFFINITY MASK - LIST MODE"
 Alternatively a list mode is supported where you can specify the CPUs delimited by ",".
-The following runs <PID> on CPU0 and CPU1:
+The following runs <PID> on CPU0 and CPU1 (equivalent to \fB0x3\fP):
 .PP 
 .nf 
 .fam C
-   #> schedtool \-a 0,1 <PID>
+   #> schedtool \-a \fB0,1\fP <PID>
 
 .SH "POLICY OVERVIEW"
 \fBSCHED_NORMAL / SCHED_OTHER\fP
