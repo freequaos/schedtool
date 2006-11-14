@@ -97,11 +97,11 @@
 #define SCHED_RR	2
 #define SCHED_BATCH	3
 #define SCHED_ISO	4
-#define SCHED_IDLE	5
+#define SCHED_IDLEPRIO	5
 
 /* for loops */
 #define SCHED_MIN SCHED_NORMAL
-#define SCHED_MAX SCHED_IDLE
+#define SCHED_MAX SCHED_IDLEPRIO
 
 #define CHECK_RANGE_POLICY(p) (p <= SCHED_MAX && p >= SCHED_MIN)
 #define CHECK_RANGE_NICE(n) (n <= 20 && n >= -20)
@@ -112,7 +112,7 @@ char *TAB[] = {
 	"R: SCHED_RR",
 	"B: SCHED_BATCH",
 	"I: SCHED_ISO",
-	"D: SCHED_IDLE",
+	"D: SCHED_IDLEPRIO",
 	0
 };
 
@@ -202,7 +202,7 @@ int main(int ac, char **dc)
 			break;
 		case '5':
 		case 'D':
-			policy=SCHED_IDLE;
+			policy=SCHED_IDLEPRIO;
                         mode |= MODE_SETPOLICY;
 			break;
 		case 'M':
@@ -559,10 +559,10 @@ void print_prio_min_max(int policy)
 	switch(min|max) {
 
 	case -1:
-		printf("%-15s: policy not implemented\n", TAB[policy]);
+		printf("%-17s: policy not implemented\n", TAB[policy]);
                 break;
 	default:
-		printf("%-15s: prio_min %d, prio_max %d\n", TAB[policy], min, max);
+		printf("%-17s: prio_min %d, prio_max %d\n", TAB[policy], min, max);
                 break;
 	}
 }
@@ -599,7 +599,7 @@ void print_process(pid_t pid)
 			      );
 		} else {
 
-			printf("PID %5d: PRIO %3d, POLICY %-15s, NICE %3d",
+			printf("PID %5d: PRIO %3d, POLICY %-17s, NICE %3d",
 			       pid,
 			       p.sched_priority,
 			       TAB[policy],
