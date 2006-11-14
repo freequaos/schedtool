@@ -230,3 +230,12 @@ v1.2.7
 
 -update man-page: get section(8) right again, mention affinity list mode
 
+
+Tue Nov 14 21:22:18 CET 2006
+v1.2.8
+
+-try to initialize aff_mask in a more portable way
+-minor man-page update
+-change SCHED_IDLE to SCHED_IDLEPRIO everywhere
+-change MANPATH to $PREFIX/share/man
+
