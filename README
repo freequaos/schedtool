@@ -23,13 +23,13 @@ ABOUT:
 
 schedtool was born, because there was no tool to change or query
 all CPU-scheduling policies under Linux, in one handy command.
-Support for CPU-affinity has also been added and most recently 
+Support for CPU-affinity has also been added and most recently
 (re-)nicing of processes.
 Thus, schedtool is the definitive interface to Linux's scheduler.
 
 It can be used to avoid skipping for A/V-applications, to lock
 processes onto certain CPUs on SMP/NUMA systems, which may be
-beneficial for networking or benchmarks, or to adjust nice-levels 
+beneficial for networking or benchmarks, or to adjust nice-levels
 of lesser important jobs to maintain a high amount of interactive
 responsiveness under high load.
 
@@ -38,8 +38,8 @@ All output, even errors, go to STDOUT to ease piping.
 If you don't know about scheduling policies, you probably don't want to
 use this program - or learn and read "man sched_setscheduler".
 
-Certain modes (as of this writing: SCHED_BATCH and SCHED_ISO) need a patched
-kernel. See INSTALL for details.
+Certain modes (as of this writing: SCHED_IDLEPRIO and SCHED_ISO) need a
+patched kernel. See INSTALL for details.
 
 
 
@@ -110,7 +110,7 @@ on the prompt would.
 CPU-affinity:
 
 To give PIDs/a command a certain CPU-affinity, use the -a switch.
-The value is used as a simple bitmask, the bit set to 1 denoting the 
+The value is used as a simple bitmask, the bit set to 1 denoting the
 PID may run on that CPU, the bit unset (0) denoting it MUST NOT.
 
 The following picture uses only 16 bits for example purpose.
@@ -136,7 +136,7 @@ As a short mnemonic rule, each 'F' denotes a set of 4 CPUs
 
 
 Since version 1.1.1 a new list mode is supported, allowing you to
-specify the target-CPUs without doing bitjuggling. To seperate the
+specify the target-CPUs without doing bitjuggling. To separate the
 different CPUs, use a ',':
 
 Run on CPU0 and CPU1:
@@ -148,9 +148,9 @@ A COMPLEX EXAMPLE:
 ------------------
 #> schedtool -R -p 50 -a 0x2 -e mplayer file.avi
 
-Execute mplayer file.avi with 
-	-SCHED_RR, 
-	-static priority 50, 
+Execute mplayer file.avi with
+	-SCHED_RR,
+	-static priority 50,
 	-affinity 0x2 (run only on CPU1).
 
 
@@ -158,26 +158,27 @@ Execute mplayer file.avi with
 ABOUT STATIC PRIORITY:
 ----------------------
 Static priority is something completely different than the nice-level; the
-nice-level is added to the dynamic priority, and the higher it gets, the more 
-the process is "punished"([2]), whereas the static priority is used to find 
-the next process to run in the current scheduling class and the higher it is 
+nice-level is added to the dynamic priority, and the higher it gets, the more
+the process is "punished"([2]), whereas the static priority is used to find
+the next process to run in the current scheduling class and the higher it is
 the more preferred >in general< the process is over others, e.g. when
-it's becomming ready after a blocking action. It will/may also preempt
+it's becoming ready after a blocking action. It will/may also preempt
 another, lower-prioritized process.
 
 STATIC_PRIO can't be assigned to SCHED_NORMAL or SCHED_BATCH. The
-code won't prevent this (a warning is printed - think UNIX), you maybe get an 
+code won't prevent this (a warning is printed - think UNIX), you maybe get an
 error later at the setting-call.
 
-v1.2.4+ support a probe mode like sched-utils; it will display each policy's 
+v1.2.4+ support a probe mode like sched-utils; it will display each policy's
 min and max priority, when given the -r parameter.
 
 #> schedtool -r
-N: SCHED_NORMAL: prio_min 0, prio_max 0
-F: SCHED_FIFO  : prio_min 1, prio_max 99
-R: SCHED_RR    : prio_min 1, prio_max 99
-B: SCHED_BATCH : policy not implemented
-I: SCHED_ISO   : policy not implemented
+N: SCHED_NORMAL  : prio_min 0, prio_max 0
+F: SCHED_FIFO    : prio_min 1, prio_max 99
+R: SCHED_RR      : prio_min 1, prio_max 99
+B: SCHED_BATCH   : prio_min 0, prio_max 0
+I: SCHED_ISO     : policy not implemented
+D: SCHED_IDLEPRIO: policy not implemented
 
 
 
@@ -200,22 +201,22 @@ sched_yield(2).
 SCHED_BATCH
 is encuraged for long-running and non-interactive
 processes; the timeslice is considerably longer (1.5s I think) -
-these processes, though, are interrupted almost anytime by other ones to 
-guarantee interactivenes.
+these processes, though, are interrupted almost anytime by other ones to
+guarantee interactiveness.
 Processes won't get any interactive boosts.
 
-Users are encuraged to set their computing jobs to SCHED_BATCH. Or, as
+Users are encouraged to set their computing jobs to SCHED_BATCH. Or, as
 admin of a compute-server, you could set their shells to SCHED_BATCH
 via the login-script.
 SCHED_BATCH has been included in 2.6.16+ kernels.
 
 
 SCHED_ISO [patch needed, see INSTALL]
-is a new mode, currently only in Con's patches, to mimick the 
+is a new mode, currently only in Con's patches, to mimick the
 real-time class for non-root users. To quote Con:
 
-"Any task trying to start as real time that doesn't have authority to do so 
-will be set to SCHED_ISO. This is a non-expiring scheduler policy designed to 
+"Any task trying to start as real time that doesn't have authority to do so
+will be set to SCHED_ISO. This is a non-expiring scheduler policy designed to
 guarantee a timeslice within a reasonable latency while preventing starvation.
 Good for gaming, video at the limits of hardware, video capture etc.
 It is best set using the schedtool by a normal user trying to start something
@@ -229,11 +230,11 @@ SCHED_IDLEPRIO [patch needed, see INSTALL]
 SCHED_IDLEPRIO was formerly called SCHED_BATCH in the -ck patchset; the
 -ck SCHED_BATCH has nothing to do with the mainline SCHED_BATCH!
 It is a policy where the process does not get any interactive boost
-(thru sleeping etc) and also only the idle CPU time.
+(through sleeping etc) and also only the idle CPU time.
 
-For more information you can read the file SCHED_DESIGN as a good overview, but 
+For more information you can read the file SCHED_DESIGN as a good overview, but
 be warned, that *some* things may be outdated by the new O(1)-patches.
-Then proceed to the man-page for sched_setscheduler(2) - it gives a very good 
+Then proceed to the man-page for sched_setscheduler(2) - it gives a very good
 overview and is _highly_ recommended.
 
 
@@ -261,7 +262,7 @@ o my girlfriend and supporting friends
 - -- - -- -
 
 [2]:
-A bit simplyfied - it's not all that easy :-) Go on to Appendix A for
+A bit simplified - it's not all that easy :-) Go on to Appendix A for
 an example on how scheduling is performed in Solaris.
 
 [3]: (see also [4])
@@ -270,7 +271,7 @@ values mean higher priority (to be put on CPU when process ready); sometimes,
 lower values mean higher priority.
 
 At the moment, I confirm my system being the following:
-- The nice-level ist SUBSTRACTED from the dynamic priority, thus giving a
+- The nice-level is SUBSTRACTED from the dynamic priority, thus giving a
 Process nice -10 means INCREASING it's priority (valuewise) by 10 points.
 - In the end, higher values mean higher priority.
 Use "ps -eO pri,nice" and look for yourself.
@@ -281,7 +282,7 @@ APPENDIX A: INTRODUCTION TO MULTI-LEVEL-QUEUE-FEEDBACK-SCHEDULING
 -----------------------------------------------------------------
 This appendix uses information originating from the "System
 Programming I"-course at my university; the examples are using Solaris
-2.X, but I think, Linux is doing it in a >similar< (albeit not that 
+2.X, but I think, Linux is doing it in a >similar< (albeit not that
 overcomplicated) way.
 
 Solaris has 60 wait queues for the class TS (TimeSharing); there are
@@ -305,14 +306,14 @@ You can display all these numbers on a Solaris-box using
 # dispadmin -c TS -g
 
 Level:
-	just an queue-ID.
+	just a queue ID.
 
 ts_quantum:
 	the maximum timeslice - the maximum time, the process
-	is allowed to run continuesly until it's interrupted and another
+	is allowed to run continuously until it's interrupted and another
 	process is physically put on the CPU.
 
-ts_tqexp: 
+ts_tqexp:
 	if the process uses it's timeslice entirely, it's put into that
 	queue [cf. Level].
 
@@ -340,7 +341,7 @@ allow him to use the CPU for more and more time.
 
 Now let's do the process a blocking action:
 
-queue  0, ts_quantum 200ms, after e.g. 100ms blocking call! --> 
+queue  0, ts_quantum 200ms, after e.g. 100ms blocking call! -->
 queue 50, ts_quantum  40ms, after e.g.  20ms blocking call! -->
 queue 58, ts_quantum  40ms
 
@@ -351,7 +352,7 @@ averagely the same computing time until a this output occurs.
 So the schedulers knows pretty much about the current state of the
 machine and can plan accordingly.
 
-The dynamic priority is something like an age - the higher[4] it is the more 
+The dynamic priority is something like an age - the higher[4] it is the more
 likely you get a seat :) (the CPU).
 There are 4 rules:
 -if a process is not run, it ages - the dynamic priority rises.
@@ -360,7 +361,7 @@ There are 4 rules:
 -processes with lower priority are/can be interrupted by processes with
 higher priority.
 
-This garantees that no process is running for too long and others are
+This guarantees that no process is running for too long and others are
 waiting for too long.
 
 	-End Of Documentation
@@ -372,5 +373,6 @@ higher (priority) in means of more important to run in the near future;
 higher does not automatically mean a higher value in it's PCB[5]
 
 [5]:
-Process Controll Block, some structure where imporatant accounting and
-else useful information is stored, usually only used by the kernel.
+Process Control Block, some structure where important accounting and
+other useful information are stored, usually only used by the kernel.
+
