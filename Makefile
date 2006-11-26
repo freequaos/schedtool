@@ -22,7 +22,7 @@ distclean: clean unzipman
 install: all install-doc zipman
 	install -d $(DESTPREFIX)/$(DESTDIR)
 	install -c $(TARGET) $(DESTPREFIX)/$(DESTDIR)
-	install -d $(DESTPREFIX)/man/man8
+	install -d $(MANDIR)
 	install -c schedtool.8.gz $(MANDIR)
 
 install-doc:
