@@ -246,3 +246,11 @@ v1.2.9
 -spelling fixes for README; thanks to Sven Hartrumpf
 -Makefile fix for installing man-page (wrong path); thanks to Adam Sampson
 
+
+Fri Jul 20 20:24:24 CEST 2007
+v1.2.10
+
+-fix incorrect use of $DISTDIR in Makefile for RPM-bulding
+ thanks to Adel Gadllah
+-fix version to 1.2.10 (forgot for 1.2.9)
+
