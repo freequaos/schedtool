@@ -3,12 +3,12 @@ CFLAGS=-Os -fomit-frame-pointer -s -pipe
 #CFLAGS=-Wall -Os -fomit-frame-pointer -s -pipe -DDEBUG
 CC=gcc
 # likewise, if you want to change the destination prefix
-DESTPREFIX=/usr/local
+DESTDIR=
+DESTPREFIX=$(DESTDIR)/usr/local
 MANDIR=$(DESTPREFIX)/share/man/man8
-DESTDIR=bin
 GZIP=gzip -9
 TARGET=schedtool
-DOCS=README INSTALL SCHED_DESIGN TUNING
+DOCS=LICENSE README INSTALL SCHED_DESIGN
 RELEASE=$(shell basename `pwd`)
 
 all: affinity
@@ -20,14 +20,14 @@ distclean: clean unzipman
 	rm -f *~ *.s
 
 install: all install-doc zipman
-	install -d $(DESTPREFIX)/$(DESTDIR)
-	install -c $(TARGET) $(DESTPREFIX)/$(DESTDIR)
+	install -d $(DESTPREFIX)/bin
+	install -p -c $(TARGET) $(DESTPREFIX)/bin
 	install -d $(MANDIR)
-	install -c schedtool.8.gz $(MANDIR)
+	install -p -c schedtool.8.gz $(MANDIR)
 
 install-doc:
-	install -d $(DESTPREFIX)/share/doc/schedtool
-	install -c $(DOCS) $(DESTPREFIX)/share/doc/schedtool
+	install -d $(DESTPREFIX)/share/doc/$(RELEASE)
+	install -p -c $(DOCS) $(DESTPREFIX)/share/doc/$(RELEASE)
 
 zipman:
 	test -f schedtool.8 && $(GZIP) schedtool.8 || exit 0
