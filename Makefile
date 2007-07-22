@@ -4,7 +4,7 @@ CFLAGS=-Os -fomit-frame-pointer -s -pipe
 CC=gcc
 # likewise, if you want to change the destination prefix
 DESTDIR=
-DESTPREFIX=$(DESTDIR)/usr/local
+DESTPREFIX=/usr/local
 MANDIR=$(DESTPREFIX)/share/man/man8
 GZIP=gzip -9
 TARGET=schedtool
@@ -20,14 +20,14 @@ distclean: clean unzipman
 	rm -f *~ *.s
 
 install: all install-doc zipman
-	install -d $(DESTPREFIX)/bin
-	install -p -c $(TARGET) $(DESTPREFIX)/bin
-	install -d $(MANDIR)
-	install -p -c schedtool.8.gz $(MANDIR)
+	install -d $(DESTDIR)$(DESTPREFIX)/bin
+	install -p -c $(TARGET) $(DESTDIR)$(DESTPREFIX)/bin
+	install -d $(DESTDIR)$(MANDIR)
+	install -p -c schedtool.8.gz $(DESTDIR)$(MANDIR)
 
 install-doc:
-	install -d $(DESTPREFIX)/share/doc/$(RELEASE)
-	install -p -c $(DOCS) $(DESTPREFIX)/share/doc/$(RELEASE)
+	install -d $(DESTDIR)$(DESTPREFIX)/share/doc/$(RELEASE)
+	install -p -c $(DOCS) $(DESTDIR)$(DESTPREFIX)/share/doc/$(RELEASE)
 
 zipman:
 	test -f schedtool.8 && $(GZIP) schedtool.8 || exit 0
