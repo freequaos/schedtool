@@ -81,7 +81,7 @@
 #define MODE_AFFINITY	0x4
 #define MODE_EXEC	0x8
 #define MODE_NICE       0x10
-#define VERSION "1.2.10"
+#define VERSION "1.3.0"
 
 /*
  constants are from the O(1)-sched kernel's include/sched.h
@@ -123,7 +123,7 @@ struct engine_s {
 	int policy;
 	int prio;
         int nice;
-	unsigned long aff_mask;
+	cpu_set_t aff_mask;
 
 	/* # of args when going in PID-mode */
 	int n;
@@ -134,7 +134,7 @@ struct engine_s {
 int engine(struct engine_s *e);
 int set_process(pid_t pid, int policy, int prio);
 unsigned long parse_affinity(char *arg);
-int set_affinity(pid_t pid, unsigned long mask);
+int set_affinity(pid_t pid, cpu_set_t *mask);
 int set_niceness(pid_t pid, int nice);
 void probe_sched_features();
 void get_prio_min_max(int policy, int *min, int *max);
@@ -158,11 +158,10 @@ int main(int ac, char **dc)
 	int policy=-1, nice=10, prio=0, mode=MODE_NOTHING;
 
 	/*
-	 default aff_mask to 0xFF..FF== all CPUs
-         unsigned long has not a defined number of bits on all arches
-	 so: use the biggest type and cast it down so we should stay portable
+	 aff_mask: zero it out
 	 */
-	unsigned long aff_mask=(unsigned long)UINT64_MAX;
+	cpu_set_t aff_mask;
+        CPU_ZERO(&aff_mask);
 
         /* for getopt() */
 	int c;
@@ -213,7 +212,7 @@ int main(int ac, char **dc)
 		case 'a':
 #ifdef HAVE_AFFINITY
 			mode |= MODE_AFFINITY;
-			aff_mask=parse_affinity(optarg);
+			parse_affinity(&aff_mask, optarg);
                         break;
 #else
 			printf("ERROR: compile-time option CPU-affinity is not supported\n");
@@ -395,7 +394,7 @@ int engine(struct engine_s *e)
 
 #ifdef HAVE_AFFINITY
 		if(mode_set(e->mode, MODE_AFFINITY)) {
-			tmpret=set_affinity(pid, e->aff_mask);
+			tmpret=set_affinity(pid, &(e->aff_mask));
 			ret += tmpret;
 
 			if(tmpret) {
@@ -456,9 +455,10 @@ int set_process(pid_t pid, int policy, int prio)
 
 
 #ifdef HAVE_AFFINITY
-unsigned long parse_affinity(char *arg)
+/* mhm - we need something clever for all that CPU_SET() and CPU_ISSET() stuff */
+int parse_affinity(cpu_set_t *mask, char *arg)
 {
-	unsigned long tmp_aff=0;
+	cpu_set_t tmp_aff;
 	char *tmp_arg;
         size_t valid_len;
 
@@ -471,13 +471,13 @@ unsigned long parse_affinity(char *arg)
 
 		/* split on ',' and '.', because '.' is near ',' :) */
 		while((tmp_arg=strsep(&arg, ",."))) {
-                        int tmp_shift;
+                        int tmp_cpu;
 
 			if(isdigit((int)*tmp_arg)) {
-				tmp_shift=atoi(tmp_arg);
-				tmp_aff |= (0x1 << tmp_shift);
+				tmp_cpu=atoi(tmp_arg);
+                                CPU_SET(tmp_cpu, &tmp_aff);
 #ifdef DEBUG
-				printf("tmp_arg: %s -> tmp_shift: 1 << %d, tmp_aff: 0x%x\n", tmp_arg, tmp_shift, tmp_aff);
+				printf("tmp_arg: %s -> tmp_cpu: %d\n", tmp_arg, tmp_cpu);
 #endif
 			}
 		}
@@ -487,18 +487,16 @@ unsigned long parse_affinity(char *arg)
 		exit(1);
 	}
 
-#ifdef DEBUG
-	printf("Affinity result: 0x%x\n", tmp_aff);
-#endif
-	return tmp_aff;
+        *mask=tmp_aff;
+	return 0;
 }
 
 
-int set_affinity(pid_t pid, unsigned long mask)
+int set_affinity(pid_t pid, cpu_set_t *mask)
 {
 	int ret;
 
-	if((ret=sched_setaffinity(pid, sizeof(mask), &mask))) {
+	if((ret=sched_setaffinity(pid, sizeof(*mask), mask))) {
 		decode_error("could not set PID %d to affinity 0x%x",
 			     pid,
                              mask
