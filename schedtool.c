@@ -577,7 +577,9 @@ void print_process(pid_t pid)
 {
 	int policy, nice;
 	struct sched_param p;
-        unsigned long aff_mask=(0-1);
+	cpu_set_t aff_mask;
+
+        CPU_ZERO(&aff_mask);
 
 	/* strict error checking not needed - it works or not. */
 	if( ((policy=sched_getscheduler(pid)) < 0)
