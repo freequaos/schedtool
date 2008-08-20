@@ -35,6 +35,8 @@
 
  */
 
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -133,7 +135,7 @@ struct engine_s {
 
 int engine(struct engine_s *e);
 int set_process(pid_t pid, int policy, int prio);
-unsigned long parse_affinity(char *arg);
+int parse_affinity(cpu_set_t *, char *arg);
 int set_affinity(pid_t pid, cpu_set_t *mask);
 int set_niceness(pid_t pid, int nice);
 void probe_sched_features();
@@ -463,8 +465,8 @@ int parse_affinity(cpu_set_t *mask, char *arg)
         size_t valid_len;
 
 	if(*arg == '0' && *(arg+1) == 'x') {
-                /* we're in standard hex mode */
-		tmp_aff=strtol(optarg, NULL, 16);
+		/* we're in standard hex mode */
+                /* FIXME TODO taskset code */
 
 	} else if( (valid_len=strspn(arg, "0123456789,.")) ) {
 		/* new list mode: schedtool -a 0,2 -> run on CPU0 and CPU2 */
