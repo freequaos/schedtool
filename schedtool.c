@@ -63,8 +63,6 @@
  */
 
 /* provide support for the syscalls even if the libc doesn't know about it */
-#ifdef HAVE_AFFINITY
-
 #ifdef AFFINITY_HACK
 #include "syscall_magic.h"
 #endif
@@ -74,7 +72,6 @@
 #error Please see the file INSTALL for more information.
 #endif
 
-#endif
 
 /* various operation modes: print/set/affinity/fork */
 #define MODE_NOTHING	0x0
@@ -212,14 +209,9 @@ int main(int ac, char **dc)
 			mode |= MODE_SETPOLICY;
 			break;
 		case 'a':
-#ifdef HAVE_AFFINITY
 			mode |= MODE_AFFINITY;
 			parse_affinity(&aff_mask, optarg);
                         break;
-#else
-			printf("ERROR: compile-time option CPU-affinity is not supported\n");
-                        return(-1);
-#endif
 		case 'n':
                         mode |= MODE_NICE;
 			nice=atoi(optarg);
@@ -394,7 +386,6 @@ int engine(struct engine_s *e)
 
 		}
 
-#ifdef HAVE_AFFINITY
 		if(mode_set(e->mode, MODE_AFFINITY)) {
 			tmpret=set_affinity(pid, &(e->aff_mask));
 			ret += tmpret;
@@ -404,7 +395,6 @@ int engine(struct engine_s *e)
 			}
 
 		}
-#endif
 
 		/* and print process info when set, too */
 		if(mode_set(e->mode, MODE_PRINT)) {
@@ -456,7 +446,6 @@ int set_process(pid_t pid, int policy, int prio)
 }
 
 
-#ifdef HAVE_AFFINITY
 /* mhm - we need something clever for all that CPU_SET() and CPU_ISSET() stuff */
 int parse_affinity(cpu_set_t *mask, char *arg)
 {
@@ -507,7 +496,6 @@ int set_affinity(pid_t pid, cpu_set_t *mask)
 	}
         return(0);
 }
-#endif
 
 
 int set_niceness(pid_t pid, int nice)
@@ -609,7 +597,6 @@ void print_process(pid_t pid)
 			      );
 		}
 
-#ifdef HAVE_AFFINITY
 		/*
 		 sched_getaffinity() seems to also return (int)4 on 2.6.8+ on x86 when successful.
 		 this goes against the documentation
@@ -623,7 +610,6 @@ void print_process(pid_t pid)
 		} else {
 			printf(", AFFINITY 0x%lx", aff_mask);
 		}
-#endif
 	printf("\n");
 	}
 }
@@ -632,31 +618,27 @@ void print_process(pid_t pid)
 void usage(void)
 {
 	printf(
-	       "get/set scheduling policies - v" VERSION ", GPL'd, NO WARRANTY\n" \
-	       "USAGE: schedtool PIDS                    - query PIDS\n" \
-	       "       schedtool [OPTIONS] PIDS          - set PIDS\n" \
-	       "       schedtool [OPTIONS] -e COMMAND    - exec COMMAND\n" \
+               "get/set scheduling policies - v" VERSION ", GPL'd, NO WARRANTY\n" \
+               "USAGE: schedtool PIDS                    - query PIDS\n" \
+               "       schedtool [OPTIONS] PIDS          - set PIDS\n" \
+               "       schedtool [OPTIONS] -e COMMAND    - exec COMMAND\n" \
                "\n" \
-	       "set scheduling policies:\n" \
-	       "    -N                    for SCHED_NORMAL\n" \
-	       "    -F -p PRIO            for SCHED_FIFO       only as root\n" \
-	       "    -R -p PRIO            for SCHED_RR         only as root\n" \
-	       "    -B                    for SCHED_BATCH\n" \
-	       "    -I -p PRIO            for SCHED_ISO\n" \
-	       "    -D                    for SCHED_IDLEPRIO\n" \
+               "set scheduling policies:\n" \
+               "    -N                    for SCHED_NORMAL\n" \
+               "    -F -p PRIO            for SCHED_FIFO       only as root\n" \
+               "    -R -p PRIO            for SCHED_RR         only as root\n" \
+               "    -B                    for SCHED_BATCH\n" \
+               "    -I -p PRIO            for SCHED_ISO\n" \
+               "    -D                    for SCHED_IDLEPRIO\n" \
                "\n" \
                "    -M POLICY             for manual mode; raw number for POLICY\n" \
-	       "    -p STATIC_PRIORITY    usually 1-99; only for FIFO or RR\n" \
-	       "                          higher numbers means higher priority\n" \
-	       "    -n NICE_LEVEL         set niceness to NICE_LEVEL\n" \
-	      );
-#ifdef HAVE_AFFINITY
-	printf("    -a AFFINITY_MASK      set CPU-affinity to bitmask or list\n\n");
-#endif
-	printf(
-	       "    -e COMMAND [ARGS]     start COMMAND with specified policy/priority\n" \
-	       "    -r                    display priority min/max for each policy\n" \
-	       "    -v                    be verbose\n" \
+               "    -p STATIC_PRIORITY    usually 1-99; only for FIFO or RR\n" \
+               "                          higher numbers means higher priority\n" \
+               "    -n NICE_LEVEL         set niceness to NICE_LEVEL\n" \
+               "    -a AFFINITY_MASK      set CPU-affinity to bitmask or list\n\n" \
+               "    -e COMMAND [ARGS]     start COMMAND with specified policy/priority\n" \
+               "    -r                    display priority min/max for each policy\n" \
+               "    -v                    be verbose\n" \
 	       "\n" \
 	      );
 /*	printf("Parent ");
