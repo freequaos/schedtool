@@ -15,14 +15,12 @@
  11/2004:
  add probing for some features (priority)
 
+ 09/2008:
+ change affinity calls to new cpu_set_t API
+
+
  Born in the need of querying and setting SCHED_* policies.
  All output, even errors, go to STDOUT to ease piping.
-
- - Setting CPU-affinity is now supported, too.
-
- - schedtool can now be used to exec a new process with specific parameters.
-
- - nice functionality is incorporated.
 
 
  Content:
@@ -48,29 +46,8 @@
 #include <unistd.h>
 #include <stdint.h>
 
-/* this gets us the list of syscalls */
-#include <linux/unistd.h>
-
 #include "error.h"
 #include "util.h"
-
-/*
- CPU-affinity stuff
- have an hack to include support for a newer kernel with older headers
- check if support is really there
-
- It's time for autoconf, baby.
- */
-
-/* provide support for the syscalls even if the libc doesn't know about it */
-#ifdef AFFINITY_HACK
-#include "syscall_magic.h"
-#endif
-
-#ifndef __NR_sched_getaffinity
-#error You tried to build with support for affinity, but your system/headers are not ready.
-#error Please see the file INSTALL for more information.
-#endif
 
 
 /* various operation modes: print/set/affinity/fork */
@@ -132,6 +109,10 @@ struct engine_s {
 
 int engine(struct engine_s *e);
 int set_process(pid_t pid, int policy, int prio);
+static inline int val_to_char(int v);
+static char * cpuset_to_str(cpu_set_t *mask, char *str);
+static inline int char_to_val(int c);
+static int str_to_cpuset(cpu_set_t *mask, const char* str);
 int parse_affinity(cpu_set_t *, char *arg);
 int set_affinity(pid_t pid, cpu_set_t *mask);
 int set_niceness(pid_t pid, int nice);
@@ -329,12 +310,15 @@ int engine(struct engine_s *e)
 	int i;
 
 #ifdef DEBUG
-	printf("Dumping mode: 0x%x\n", e->mode);
-	printf("Dumping affinity: 0x%x\n", e->aff_mask);
-	printf("We have %d args to do\n", e->n);
-	for(i=0;i < e->n; i++) {
-		printf("Dump arg %d: %s\n", i, e->args[i]);
-	}
+	do {
+		char tmpaff[7 * CPU_SETSIZE];
+		printf("Dumping mode: 0x%x\n", e->mode);
+		printf("Dumping affinity: 0x%s\n", cpuset_to_str(&(e->aff_mask), tmpaff));
+		printf("We have %d args to do\n", e->n);
+		for(i=0;i < e->n; i++) {
+			printf("Dump arg %d: %s\n", i, e->args[i]);
+		}
+	} while(0);
 #endif
 
 	/*
@@ -344,6 +328,10 @@ int engine(struct engine_s *e)
 	for(i=0; i < e->n; i++) {
 
 		int pid, tmpret=0;
+		cpu_set_t affi;
+
+		CPU_ZERO(&affi);
+                CPU_SET(0, &affi);
 
                 /* if in MODE_EXEC skip check for PIDs */
 		if(mode_set(e->mode, MODE_EXEC)) {
@@ -446,16 +434,111 @@ int set_process(pid_t pid, int policy, int prio)
 }
 
 
+/*
+ the following functions have been taken from taskset of util-linux
+ (C) 2004 by Robert Love
+ */
+static inline int val_to_char(int v)
+{
+	if (v >= 0 && v < 10)
+		return '0' + v;
+	else if (v >= 10 && v < 16)
+		return ('a' - 10) + v;
+	else 
+		return -1;
+}
+
+
+/*
+ str needs to hold [CPU_SETSIZE * 7] chars
+ will pad with zeroes to the start, so print the string starting at the
+ returned char *
+ */
+static char * cpuset_to_str(cpu_set_t *mask, char *str)
+{
+	int base;
+	char *ptr = str;
+	char *ret = 0;
+
+	for (base = CPU_SETSIZE - 4; base >= 0; base -= 4) {
+		char val = 0;
+		if (CPU_ISSET(base, mask))
+			val |= 1;
+		if (CPU_ISSET(base + 1, mask))
+			val |= 2;
+		if (CPU_ISSET(base + 2, mask))
+			val |= 4;
+		if (CPU_ISSET(base + 3, mask))
+			val |= 8;
+		if (!ret && val)
+			ret = ptr;
+		*ptr++ = val_to_char(val);
+	}
+	*ptr = 0;
+	return ret ? ret : ptr - 1;
+}
+
+
+static inline int char_to_val(int c)
+{
+	int cl;
+
+	cl = tolower(c);
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	else if (cl >= 'a' && cl <= 'f')
+		return cl + (10 - 'a');
+	else
+		return -1;
+}
+
+
+static int str_to_cpuset(cpu_set_t *mask, const char* str)
+{
+	int len = strlen(str);
+	const char *ptr = str + len - 1;
+	int base = 0;
+
+	/* skip 0x, it's all hex anyway */
+	if(len > 1 && str[0] == '0' && str[1] == 'x') {
+		str += 2;
+	}
+
+	CPU_ZERO(mask);
+	while (ptr >= str) {
+		char val = char_to_val(*ptr);
+		if (val == (char) -1)
+			return -1;
+		if (val & 1)
+			CPU_SET(base, mask);
+		if (val & 2)
+			CPU_SET(base + 1, mask);
+		if (val & 4)
+			CPU_SET(base + 2, mask);
+		if (val & 8)
+			CPU_SET(base + 3, mask);
+		len--;
+		ptr--;
+		base += 4;
+	}
+
+	return 0;
+}
+/* end of functions taken */
+
+
 /* mhm - we need something clever for all that CPU_SET() and CPU_ISSET() stuff */
 int parse_affinity(cpu_set_t *mask, char *arg)
 {
 	cpu_set_t tmp_aff;
 	char *tmp_arg;
-        size_t valid_len;
+	size_t valid_len;
+
+        CPU_ZERO(&tmp_aff);
 
 	if(*arg == '0' && *(arg+1) == 'x') {
 		/* we're in standard hex mode */
-                /* FIXME TODO taskset code */
+		str_to_cpuset(&tmp_aff, arg);
 
 	} else if( (valid_len=strspn(arg, "0123456789,.")) ) {
 		/* new list mode: schedtool -a 0,2 -> run on CPU0 and CPU2 */
@@ -486,11 +569,12 @@ int parse_affinity(cpu_set_t *mask, char *arg)
 int set_affinity(pid_t pid, cpu_set_t *mask)
 {
 	int ret;
+	char aff_hex[7 * CPU_SETSIZE];
 
-	if((ret=sched_setaffinity(pid, sizeof(*mask), mask))) {
-		decode_error("could not set PID %d to affinity 0x%x",
+	if((ret=sched_setaffinity(pid, sizeof(cpu_set_t), mask)) == -1) {
+		decode_error("could not set PID %d to affinity 0x%s",
 			     pid,
-                             mask
+			     cpuset_to_str(mask, aff_hex)
 			    );
 		return(ret);
 	}
@@ -566,6 +650,8 @@ void print_process(pid_t pid)
 	int policy, nice;
 	struct sched_param p;
 	cpu_set_t aff_mask;
+	char aff_mask_hex[7 * CPU_SETSIZE];
+
 
         CPU_ZERO(&aff_mask);
 
@@ -608,7 +694,7 @@ void print_process(pid_t pid)
 			 */
                         errno=0;
 		} else {
-			printf(", AFFINITY 0x%lx", aff_mask);
+			printf(", AFFINITY 0x%s", cpuset_to_str(&aff_mask, aff_mask_hex));
 		}
 	printf("\n");
 	}
