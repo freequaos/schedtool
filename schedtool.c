@@ -82,6 +82,13 @@
 #define CHECK_RANGE_POLICY(p) (p <= SCHED_MAX && p >= SCHED_MIN)
 #define CHECK_RANGE_NICE(n) (n <= 20 && n >= -20)
 
+/*
+ 4 bits of CPU_SETSIZE will naturally reduce to 1 char, so
+ we'd only need [CPU_SETSIZE / 4 + 1]
+ to be sure leave a bit of room and only do CPU_SETSIZE / 2
+ */
+#define CPUSET_HEXSTRING(name) char name[CPU_SETSIZE / 2]
+
 char *TAB[] = {
 	"N: SCHED_NORMAL",
 	"F: SCHED_FIFO",
@@ -311,7 +318,7 @@ int engine(struct engine_s *e)
 
 #ifdef DEBUG
 	do {
-		char tmpaff[7 * CPU_SETSIZE];
+		CPUSET_HEXSTRING(tmpaff);
 		printf("Dumping mode: 0x%x\n", e->mode);
 		printf("Dumping affinity: 0x%s\n", cpuset_to_str(&(e->aff_mask), tmpaff));
 		printf("We have %d args to do\n", e->n);
@@ -450,7 +457,10 @@ static inline int val_to_char(int v)
 
 
 /*
- str needs to hold [CPU_SETSIZE * 7] chars
+ str seems to need to hold [CPU_SETSIZE * 7] chars, as in used in taskset
+ however, 4 bits of CPU_SETSIZE will naturally reduce to 1 char
+ (bits "1111" -> char "f") so CPU_SETSIZE / 4 + 1 should be sufficient
+
  will pad with zeroes to the start, so print the string starting at the
  returned char *
  */
@@ -569,7 +579,7 @@ int parse_affinity(cpu_set_t *mask, char *arg)
 int set_affinity(pid_t pid, cpu_set_t *mask)
 {
 	int ret;
-	char aff_hex[7 * CPU_SETSIZE];
+	CPUSET_HEXSTRING(aff_hex);
 
 	if((ret=sched_setaffinity(pid, sizeof(cpu_set_t), mask)) == -1) {
 		decode_error("could not set PID %d to affinity 0x%s",
@@ -650,7 +660,7 @@ void print_process(pid_t pid)
 	int policy, nice;
 	struct sched_param p;
 	cpu_set_t aff_mask;
-	char aff_mask_hex[7 * CPU_SETSIZE];
+	CPUSET_HEXSTRING(aff_mask_hex);
 
 
         CPU_ZERO(&aff_mask);
