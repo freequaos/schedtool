@@ -36,20 +36,10 @@ INSTALLING:
 -----------
 If you want to build WITH CPU-affinity support, do
 	#> make
-or
-	#> make affinity
 
 If that gives you errors about affinity or sched_setaffinity, you don't 
 have your system ready for affinity - likely you have a too old glibc 
 without that support.
-
-If you are sure your kernel does support affinity, you can build with
-	#> make affinity_hack
-
-
-To build without affinity:
-	#> make no_affinity
-
 
 To install, type:
 	#> make install
