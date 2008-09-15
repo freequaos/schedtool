@@ -254,3 +254,10 @@ v1.2.10
  thanks to Adel Gadllah
 -fix version to 1.2.10 (forgot for 1.2.9)
 
+
+Mon Sep 15 15:35:29 CEST 2008
+v1.3.0
+
+-bring schedtool to new glibc affinity api (cpu_set_t) & make it work under new glibcs again
+-bug-fix behaviour when 1 wrong PID was given - all other (valid) PIDs would run into error
+
