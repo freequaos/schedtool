@@ -11,7 +11,7 @@ TARGET=schedtool
 DOCS=LICENSE README INSTALL SCHED_DESIGN
 RELEASE=$(shell basename `pwd`)
 
-all: affinity
+all: $(TARGET)
 
 clean:
 	rm -f *.o $(TARGET)
@@ -35,14 +35,8 @@ zipman:
 unzipman:
 	test -f schedtool.8.gz && $(GZIP) -d schedtool.8.gz || exit 0
 
-affinity:
-	$(MAKE) CFLAGS="$(CFLAGS) -DHAVE_AFFINITY" $(TARGET)
-
 affinity_hack: clean
-	$(MAKE) CFLAGS="$(CFLAGS) -DHAVE_AFFINITY -DHAVE_AFFINITY_HACK" $(TARGET)
-
-no_affinity: clean
-	$(MAKE) CFLAGS="$(CFLAGS)" $(TARGET)
+	$(MAKE) CFLAGS="$(CFLAGS) -DHAVE_AFFINITY_HACK" $(TARGET)
 
 release: distclean release_gz release_bz2
 	@echo --- $(RELEASE) released ---
