@@ -663,9 +663,10 @@ void print_process(pid_t pid)
 	CPUSET_HEXSTRING(aff_mask_hex);
 
 
-        CPU_ZERO(&aff_mask);
+	CPU_ZERO(&aff_mask);
 
 	/* strict error checking not needed - it works or not. */
+        errno=0;
 	if( ((policy=sched_getscheduler(pid)) < 0)
 	    || (sched_getparam(pid, &p) < 0)
 	    /* getpriority may successfully return negative values, so errno needs to be checked */
