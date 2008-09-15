@@ -51,6 +51,6 @@ release_bz2: distclean
 
 
 schedtool: schedtool.o error.o
-schedtool.o: schedtool.c syscall_magic.h error.h util.h
+schedtool.o: schedtool.c error.h util.h
 error.o: error.c error.h
 
