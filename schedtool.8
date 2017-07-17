@@ -191,7 +191,7 @@ This is the default policy and for the average program with some interaction. Do
 
 .PP
 \fBSCHED_FIFO\fP
-First-In, First Out Scheduler, used only for real-time contraints.
+First-In, First Out Scheduler, used only for real-time constraints.
 Processes in this class are usually not preempted by others, they need to free
 themselves from the CPU via sched_yield() and as such you need special
 designed applications. \fBUse with extreme care.\fP
@@ -223,7 +223,7 @@ Good for gaming, video at the limits of hardware, video capture etc."
 
 .PP
 \fBSCHED_IDLEPRIO\fP [ patch needed ]
-SCHED_IDLEPRIO is similar to SCHED_BATCH, but was explicitely designed
+SCHED_IDLEPRIO is similar to SCHED_BATCH, but was explicitly designed
 to consume only the time the CPU is idle. No interactive boosting is done.
 If you used SCHED_BATCH in the -ck kernels this is what you want since
 2.6.16
