@@ -1,5 +1,5 @@
 schedtool
-Copyright (C) 2002-2006 Freek
+Copyright (C) 2002-2017 Freek
 Release under GPL, version 2 (see LICENSE)
 Use at your own risk.
 Inspired by setbatch (C) 2002 Ingo Molnar
@@ -239,15 +239,6 @@ overview and is _highly_ recommended.
 
 
 
-FINAL WORDS / CONTACT:
-----------------------
-If you feel you are able to make this software better or you can report
-some numbers with the different scheduling policies, please contact me.
-Feedback is appreciated.
-Please use freshmeat.net's "contact author"-feature to do so.
-
-
-
 THANKS:
 -------
 Thanks fly out to (in no particular order)
@@ -255,7 +246,6 @@ Thanks fly out to (in no particular order)
 o Ingo Molnar
 o Con Kolivas for suggesting the -e switch, submitting patch for SCHED_ISO
 o Samuli Kärkkäinen, the quality-verification-engineer
-o my girlfriend and supporting friends
 
 
 
